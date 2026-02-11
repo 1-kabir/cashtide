@@ -41,8 +41,59 @@ const authenticateToken = async (req, res, next) => {
   }
 };
 
+// Authorization middleware to check if user owns the wallet or has access to it
+const authorizeWalletAccess = async (req, res, next) => {
+  try {
+    const { id: userId } = req.user;
+    const walletId = req.params.id || req.body.wallet_id;
+
+    if (!walletId) {
+      return res.status(400).json({ error: { message: 'Wallet ID is required' } });
+    }
+
+    // Check if the wallet belongs to the user directly
+    let { data: wallet, error } = await supabase
+      .from('wallets')
+      .select('*')
+      .eq('id', walletId)
+      .eq('user_id', userId)
+      .single();
+
+    if (!error && wallet) {
+      // User owns the wallet directly
+      req.wallet = wallet;
+      return next();
+    }
+
+    // If not owned directly, check if user has shared access
+    const { data: sharedWallet, error: sharedError } = await supabase
+      .from('shared_wallets')
+      .select(`
+        *,
+        wallets (*)
+      `)
+      .eq('wallet_id', walletId)
+      .eq('user_id', userId)
+      .eq('accepted', true)
+      .single();
+
+    if (sharedError || !sharedWallet) {
+      return res.status(403).json({ error: { message: 'Access denied to this wallet' } });
+    }
+
+    // User has shared access to the wallet
+    req.wallet = sharedWallet.wallets;
+    req.sharedWalletPermission = sharedWallet.permission_level;
+    next();
+  } catch (err) {
+    console.error('Authorization error:', err);
+    return res.status(500).json({ error: { message: 'Authorization check failed' } });
+  }
+};
+
 module.exports = {
   generateToken,
   verifyToken,
-  authenticateToken
+  authenticateToken,
+  authorizeWalletAccess
 };

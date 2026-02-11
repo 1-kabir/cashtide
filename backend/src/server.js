@@ -5,6 +5,18 @@ require('dotenv').config();
 
 const authController = require('./controllers/authController');
 
+// Import routes
+const walletRoutes = require('./routes/wallets');
+const transactionListRoutes = require('./routes/transactions');
+const transactionRoutes = require('./routes/transactions-all');
+const subscriptionListRoutes = require('./routes/subscriptions');
+const subscriptionRoutes = require('./routes/subscriptions-all');
+const freeTrialListRoutes = require('./routes/free-trials');
+const freeTrialRoutes = require('./routes/free-trials-all');
+const sharedWalletRoutes = require('./routes/shared-wallets');
+const aiRoutes = require('./routes/ai');
+const extensionRoutes = require('./routes/extension');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -35,6 +47,18 @@ app.post('/api/auth/login', authController.login);
 app.get('/api/auth/me', authController.getCurrentUser);
 app.post('/api/auth/logout', authController.logout);
 
+// API routes
+app.use('/api/wallets', walletRoutes);
+app.use('/api/wallets/:walletId/transactions', transactionListRoutes);  // Nested route for transactions
+app.use('/api/transactions', transactionRoutes);  // Individual transaction routes
+app.use('/api/wallets/:walletId/subscriptions', subscriptionListRoutes);  // Nested route for subscriptions
+app.use('/api/subscriptions', subscriptionRoutes);  // Individual subscription routes
+app.use('/api/wallets/:walletId/free-trials', freeTrialListRoutes);  // Nested route for free trials
+app.use('/api/free-trials', freeTrialRoutes);  // Individual free trial routes
+app.use('/api', sharedWalletRoutes);  // Shared wallet routes
+app.use('/api', aiRoutes);  // AI assistant routes
+app.use('/api', extensionRoutes);  // Extension processing routes
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
@@ -64,6 +88,42 @@ app.listen(PORT, () => {
   console.log(`  POST http://localhost:${PORT}/api/auth/login`);
   console.log(`  GET  http://localhost:${PORT}/api/auth/me`);
   console.log(`  POST http://localhost:${PORT}/api/auth/logout`);
+  console.log(`Wallet endpoints available:`);
+  console.log(`  GET    http://localhost:${PORT}/api/wallets`);
+  console.log(`  POST   http://localhost:${PORT}/api/wallets`);
+  console.log(`  GET    http://localhost:${PORT}/api/wallets/:id`);
+  console.log(`  PUT    http://localhost:${PORT}/api/wallets/:id`);
+  console.log(`  DELETE http://localhost:${PORT}/api/wallets/:id`);
+  console.log(`Transaction endpoints available:`);
+  console.log(`  GET    http://localhost:${PORT}/api/wallets/:id/transactions`);
+  console.log(`  POST   http://localhost:${PORT}/api/wallets/:id/transactions`);
+  console.log(`  GET    http://localhost:${PORT}/api/transactions/:transactionId`);
+  console.log(`  PUT    http://localhost:${PORT}/api/transactions/:transactionId`);
+  console.log(`  DELETE http://localhost:${PORT}/api/transactions/:transactionId`);
+  console.log(`Subscription endpoints available:`);
+  console.log(`  GET    http://localhost:${PORT}/api/wallets/:id/subscriptions`);
+  console.log(`  POST   http://localhost:${PORT}/api/wallets/:id/subscriptions`);
+  console.log(`  PUT    http://localhost:${PORT}/api/subscriptions/:subscriptionId`);
+  console.log(`  DELETE http://localhost:${PORT}/api/subscriptions/:subscriptionId`);
+  console.log(`Free Trial endpoints available:`);
+  console.log(`  GET    http://localhost:${PORT}/api/wallets/:id/free-trials`);
+  console.log(`  POST   http://localhost:${PORT}/api/wallets/:id/free-trials`);
+  console.log(`  PUT    http://localhost:${PORT}/api/free-trials/:freeTrialId`);
+  console.log(`  DELETE http://localhost:${PORT}/api/free-trials/:freeTrialId`);
+  console.log(`Shared Wallet endpoints available:`);
+  console.log(`  POST   http://localhost:${PORT}/api/wallets/:id/share`);
+  console.log(`  PUT    http://localhost:${PORT}/api/shared-wallets/:sharedWalletId`);
+  console.log(`  PUT    http://localhost:${PORT}/api/shared-wallets/:sharedWalletId/respond`);
+  console.log(`  DELETE http://localhost:${PORT}/api/shared-wallets/:sharedWalletId`);
+  console.log(`  GET    http://localhost:${PORT}/api/shared-wallets/invitations`);
+  console.log(`AI Assistant endpoints available:`);
+  console.log(`  POST   http://localhost:${PORT}/api/ai/assistant`);
+  console.log(`  GET    http://localhost:${PORT}/api/ai/assistant/history`);
+  console.log(`  DELETE http://localhost:${PORT}/api/ai/assistant/history`);
+  console.log(`Chrome Extension endpoints available:`);
+  console.log(`  POST   http://localhost:${PORT}/api/ai/extension/capture`);
+  console.log(`  GET    http://localhost:${PORT}/api/ai/extension/status/:extractionId`);
+  console.log(`  POST   http://localhost:${PORT}/api/ai/extension/confirm/:extractionId`);
 });
 
 module.exports = app;

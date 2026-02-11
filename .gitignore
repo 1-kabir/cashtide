@@ -184,3 +184,5 @@ pnpm-debug.log*
 unstructured_thoughts.txt
 
 QWEN.md
+
+.github/copilot-instructions.md
