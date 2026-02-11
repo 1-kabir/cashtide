@@ -1,0 +1,30 @@
+{
+  "name": "cashtide",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "mobile",
+    "chrome-extension"
+  ],
+  "scripts": {
+    "dev:backend": "cd backend && pnpm run dev",
+    "dev:mobile": "cd mobile && pnpm run start",
+    "build:extension": "cd chrome-extension && pnpm run build",
+    "test": "pnpm --recursive test",
+    "format": "pnpm --recursive format",
+    "lint": "pnpm --recursive lint",
+    "install:all": "pnpm install && cd backend && pnpm install && cd ../mobile && pnpm install && cd ../chrome-extension && pnpm install"
+  },
+  "pnpm": {
+    "overrides": {
+      "tar": "^7.5.7",
+      "fast-xml-parser": "^5.3.4",
+      "langsmith": "^0.4.6",
+      "send": "^0.19.0"
+    }
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
